@@ -82,6 +82,8 @@ class _HomeTabState extends State<HomeTab> {
                 title: availabilityTitle,
                 color: availabilityColor,
                 onPressed: () {
+
+
                   showModalBottomSheet(
                     isDismissible: false,
                     context: context,
@@ -165,7 +167,7 @@ class _HomeTabState extends State<HomeTab> {
     currentFireBaseUser = await FirebaseAuth.instance.currentUser;
     PushNotificationService pushNotificationService = PushNotificationService();
 
-    pushNotificationService.initialize();
+    pushNotificationService.initialize(context);
     pushNotificationService.getToken();
 
 
