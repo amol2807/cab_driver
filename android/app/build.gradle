@@ -25,17 +25,6 @@ apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 apply plugin: 'com.google.gms.google-services'
 
-dependencies {
-    // Import the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:26.1.0')
-
-    // Add the dependencies for the desired Firebase products
-    // https://firebase.google.com/docs/android/setup#available-libraries
-}
-
-
-
-
 android {
     compileSdkVersion 28
 
@@ -64,3 +53,16 @@ android {
 flutter {
     source '../..'
 }
+
+dependencies {
+    // Import the Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:26.1.0')
+    implementation 'com.google.firebase:firebase-messaging:21.0.0'
+
+
+    // Add the dependencies for the desired Firebase products
+    // https://firebase.google.com/docs/android/setup#available-libraries
+}
+
+
+

@@ -1,26 +1,24 @@
 import 'package:cab_driver/brand_colors.dart';
+import 'package:cab_driver/globalvariables.dart';
 import 'package:cab_driver/tabs/earningstab.dart';
 import 'package:cab_driver/tabs/hometab.dart';
 import 'package:cab_driver/tabs/profiletab.dart';
 import 'package:cab_driver/tabs/ratingstab.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
-
   static const String id = 'mainpage';
 
   @override
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin {
-
+class _MainPageState extends State<MainPage>
+    with SingleTickerProviderStateMixin {
   TabController tabController;
-  int selectedIndex  = 0; // Variable to track index of item selected
+  int selectedIndex = 0; // Variable to track index of item selected
 
-  void onItemClicked(int index)
-  {
+  void onItemClicked(int index) {
     setState(() {
       selectedIndex = index;
       tabController.index = selectedIndex;
@@ -32,6 +30,11 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
     // TODO: implement initState
     super.initState();
     tabController = TabController(length: 4, vsync: this);
+
+    if (currentFireBaseUser == null)
+      print('User null hai yaarrrr');
+    else
+      print('User id hai ${currentFireBaseUser.uid}');
   }
 
   @override
@@ -39,14 +42,11 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
     // TODO: implement dispose
     tabController.dispose();
     super.dispose();
-
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: TabBarView(
         physics: NeverScrollableScrollPhysics(),
         controller: tabController,
@@ -55,10 +55,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
           EarningsTab(),
           RatingsTab(),
           ProfileTab(),
-
-
         ],
-
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
@@ -78,8 +75,6 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
             icon: Icon(Icons.person),
             title: Text('Account'),
           ),
-
-
         ],
         currentIndex: selectedIndex,
         unselectedItemColor: BrandColors.colorIcon,
@@ -89,8 +84,6 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
         type: BottomNavigationBarType.fixed,
         onTap: onItemClicked,
       ),
-
     );
   }
 }
-

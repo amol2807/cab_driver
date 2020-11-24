@@ -151,6 +151,7 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushNamedAndRemoveUntil(
               context, MainPage.id, (route) => false);
         }
+        else print('User null hai');
       });
     }
   }

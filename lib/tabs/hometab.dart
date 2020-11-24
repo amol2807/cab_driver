@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:cab_driver/brand_colors.dart';
+import 'package:cab_driver/helpers/pushnotificationservice.dart';
 import 'package:cab_driver/widgets/AvailabilityButton.dart';
 import 'package:cab_driver/widgets/confirmsheet.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
@@ -32,6 +34,9 @@ class _HomeTabState extends State<HomeTab> {
   Color availabilityColor = BrandColors.colorOrange;
 
   bool isAvailable = false;
+
+
+
 
   void getCurrentPosition() async {
     Position position = await Geolocator.getCurrentPosition(
@@ -154,4 +159,25 @@ class _HomeTabState extends State<HomeTab> {
     tripRequestRef.remove();
     tripRequestRef = null;
   }
+
+  void getCurrentDriverInfo() async{
+
+    currentFireBaseUser = await FirebaseAuth.instance.currentUser;
+    PushNotificationService pushNotificationService = PushNotificationService();
+
+    pushNotificationService.initialize();
+    pushNotificationService.getToken();
+
+
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getCurrentDriverInfo();
+
+  }
+
+
 }

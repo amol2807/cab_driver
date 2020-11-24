@@ -19,6 +19,7 @@ Future<void> main() async {
       databaseURL: 'https://geetaxi-b086a.firebaseio.com',
     ),
   );
+
   runApp(MyApp());
 
   currentFireBaseUser = await FirebaseAuth.instance.currentUser;
