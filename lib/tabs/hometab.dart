@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cab_driver/brand_colors.dart';
+import 'package:cab_driver/datamodels/driver.dart';
 import 'package:cab_driver/helpers/pushnotificationservice.dart';
 import 'package:cab_driver/widgets/AvailabilityButton.dart';
 import 'package:cab_driver/widgets/confirmsheet.dart';
@@ -24,7 +25,6 @@ class _HomeTabState extends State<HomeTab> {
 
   DatabaseReference tripRequestRef;
 
-  Position currentPosition;
 
   var geolocator = Geolocator();
   var locationOptions = LocationOptions(
@@ -165,6 +165,21 @@ class _HomeTabState extends State<HomeTab> {
   void getCurrentDriverInfo() async{
 
     currentFireBaseUser = await FirebaseAuth.instance.currentUser;
+
+    DatabaseReference driverRef = FirebaseDatabase.instance.reference().child('drivers/${currentFireBaseUser.uid}');
+    driverRef.once().then((DataSnapshot snapshot){
+
+      if(snapshot.value!=null)
+        {
+
+         currentDriverInfo = Driver.fromSnapShot(snapshot);
+
+
+        }
+
+    });
+
+
     PushNotificationService pushNotificationService = PushNotificationService();
 
     pushNotificationService.initialize(context);

@@ -4,6 +4,7 @@ import 'package:cab_driver/tabs/earningstab.dart';
 import 'package:cab_driver/tabs/hometab.dart';
 import 'package:cab_driver/tabs/profiletab.dart';
 import 'package:cab_driver/tabs/ratingstab.dart';
+import 'package:cab_driver/tabs/signouttab.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
@@ -29,7 +30,7 @@ class _MainPageState extends State<MainPage>
   void initState() {
     // TODO: implement initState
     super.initState();
-    tabController = TabController(length: 4, vsync: this);
+    tabController = TabController(length: 5, vsync: this);
 
     if (currentFireBaseUser == null)
       print('User null hai yaarrrr');
@@ -55,6 +56,7 @@ class _MainPageState extends State<MainPage>
           EarningsTab(),
           RatingsTab(),
           ProfileTab(),
+          SignOutTab(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -75,7 +77,12 @@ class _MainPageState extends State<MainPage>
             icon: Icon(Icons.person),
             title: Text('Account'),
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            title: Text('LogOut'),
+          )
         ],
+
         currentIndex: selectedIndex,
         unselectedItemColor: BrandColors.colorIcon,
         selectedItemColor: BrandColors.colorOrange,

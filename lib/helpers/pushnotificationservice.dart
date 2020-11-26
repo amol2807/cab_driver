@@ -37,9 +37,6 @@ class PushNotificationService {
     
     fcm.subscribeToTopic('alldrivers');
     fcm.subscribeToTopic('allusers');
-
-
-
   }
 
   String getRideID(Map<String, dynamic> message){

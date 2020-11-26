@@ -38,6 +38,8 @@ dependencies:
   firebase_messaging: ^7.0.3
   assets_audio_player: ^2.0.13+1
   toast: ^0.1.5
+  maps_toolkit: ^1.1.0+2
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

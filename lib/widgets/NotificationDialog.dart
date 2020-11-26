@@ -1,6 +1,7 @@
 import 'package:cab_driver/brand_colors.dart';
 import 'package:cab_driver/datamodels/tripdetails.dart';
 import 'package:cab_driver/globalvariables.dart';
+import 'package:cab_driver/helpers/helpermethods.dart';
 import 'package:cab_driver/screens/newtrippage.dart';
 import 'package:cab_driver/widgets/BrandDivider.dart';
 import 'package:cab_driver/widgets/TaxiOutlineButton.dart';
@@ -129,6 +130,9 @@ class NotificationDailog extends StatelessWidget {
       if(thisRideID==tripDetails.rideID)
         {
           newRideRef.set('accepted');
+
+          HelperMethods.disableHomeTabLocationUpdates(); // To stop the driver from taking more trips as he is already occupied
+
           Navigator.push(context, MaterialPageRoute(builder: (context)=>NewTripPage(tripDetails: tripDetails,)));
         }
       else if(thisRideID=='cancelled'){
