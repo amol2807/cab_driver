@@ -6,6 +6,7 @@ import 'package:cab_driver/globalvariables.dart';
 import 'package:cab_driver/helpers/helpermethods.dart';
 import 'package:cab_driver/helpers/mapkithelper.dart';
 import 'package:cab_driver/widgets/TaxiButton.dart';
+import 'package:cab_driver/widgets/collectPaymentDialog.dart';
 import 'package:cab_driver/widgets/progressdialogue.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -44,6 +45,19 @@ class _NewTripPageState extends State<NewTripPage> {
   BitmapDescriptor movingMarkerIcon;
 
   Position myPosition;
+
+  String status='accepted';
+
+  String durationString='';
+
+  bool isRequestingDirection=false;
+
+  String buttonTitle='ARRIVED';
+  Color buttonColor=BrandColors.colorGreen;
+
+  Timer timer;
+
+  int durationCounter=0;
 
   void createMarker() {
     if (movingMarkerIcon == null) {
@@ -130,7 +144,7 @@ class _NewTripPageState extends State<NewTripPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      '14 Mins',
+                      durationString,
                       style: TextStyle(
                         fontSize: 14,
                         fontFamily: 'Brand-Bold',
@@ -206,9 +220,38 @@ class _NewTripPageState extends State<NewTripPage> {
                       height: 25,
                     ),
                     TaxiButton(
-                      title: 'ARRIVED',
-                      color: BrandColors.colorGreen,
-                      onPressed: () {},
+                      title: buttonTitle,
+                      color: buttonColor,
+                      onPressed: ()async {
+                        if(status=='accepted')
+                          {
+                            status='arrived';
+                            rideRef.child('status').set('arrived');
+
+                            setState(() {
+                              buttonColor=BrandColors.colorAccentPurple;
+                              buttonTitle='Start Trip';
+                            });
+                            HelperMethods.showProgressDialog(context);
+                            await getDirection(widget.tripDetails.pickup, widget.tripDetails.destination);
+                            Navigator.pop(context);
+
+                          }
+                        else if(status=='arrived')
+                          {
+                            status='ontrip';
+                            rideRef.child('status').set('ontrip');
+
+                            setState(() {
+                              buttonColor=Colors.red[800];
+                              buttonTitle='END TRIP';
+                            });
+                            startTimer();
+                          }
+                        else if(status=='ontrip'){
+                          endTrip();
+                        }
+                      },
                     )
                   ],
                 ),
@@ -384,6 +427,90 @@ class _NewTripPageState extends State<NewTripPage> {
       });
 
       oldPosition = LatLng(position.latitude, position.longitude);
+      updateTripDetails();
+
+      Map locationMap={
+        'latitude':myPosition.latitude.toString(),
+        'longitude':myPosition.longitude.toString(),
+      };
+
+      rideRef.child('driver_location').set(locationMap);
+    });
+  }
+
+  void updateTripDetails ()async
+  {
+
+    if(!isRequestingDirection){
+      isRequestingDirection=true;
+
+      if(myPosition==null){
+        return;
+      }
+      var positionLatLng = LatLng(myPosition.latitude, myPosition.longitude);
+
+      LatLng destinationLatLng;
+      if(status=='accepted')
+      {
+        destinationLatLng=widget.tripDetails.pickup;
+      }
+      else
+      {
+        destinationLatLng=widget.tripDetails.destination;
+      }
+      var directionDetails=await HelperMethods.getDirectionDetails(positionLatLng, destinationLatLng);
+
+      if(directionDetails!=null)
+      {
+        setState(() {
+          durationString=directionDetails.durationText;
+        });
+      }
+      isRequestingDirection=false;
+    }
+  }
+
+  void startTimer(){
+    const interval=Duration(seconds: 1);
+    timer=Timer.periodic(interval, (timer) {
+      durationCounter++;
+    });
+  }
+
+  void endTrip()async{
+    timer.cancel();
+    HelperMethods.showProgressDialog(context);
+    var currentLatLng=LatLng(myPosition.latitude, myPosition.longitude);
+    var directionDetails=await HelperMethods.getDirectionDetails(widget.tripDetails.pickup, currentLatLng);
+    Navigator.pop(context);
+    int fares=HelperMethods.estimateFares(directionDetails, durationCounter);
+    rideRef.child('fares').set(fares.toString());
+    rideRef.child('status').set('ended');
+    ridePositionStream.cancel();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:(BuildContext context)=>CollectPayment(
+        paymentMethod: widget.tripDetails.paymentMethod,
+        fares: fares,
+      )
+    );
+    topUpEarnings(fares);
+  }
+
+  void topUpEarnings(int fares){
+    DatabaseReference earningsRef=FirebaseDatabase.instance.reference().child('drivers/${currentFireBaseUser.uid}/earnings');
+    earningsRef.once().then((DataSnapshot snapshot){
+      if(snapshot.value!=null){
+        double oldEarnings=double.parse(snapshot.value.toString());
+        double adjustedFares=(fares.toDouble()*0.85)+oldEarnings;
+        earningsRef.set(adjustedFares.toStringAsFixed(2));
+      }
+      else
+        {
+          double adjustedFares=(fares.toDouble()*0.85);
+          earningsRef.set(adjustedFares.toStringAsFixed(2));
+        }
     });
   }
 }

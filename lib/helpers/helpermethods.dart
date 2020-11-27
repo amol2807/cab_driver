@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:cab_driver/datamodels/directiondetails.dart';
 import 'package:cab_driver/globalvariables.dart';
 import 'package:cab_driver/helpers/requesthelper.dart';
+import 'package:cab_driver/widgets/progressdialogue.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -27,24 +29,16 @@ class HelperMethods{
       directionDetails.encodedPoints=response['routes'][0]['overview_polyline']['points'];
       return directionDetails;
     }
-    static int estimateFares(DirectionDetails details)
+    static int estimateFares(DirectionDetails details,int durationValue)
     {
       //per km = 0.3$
       //per min = 0.2$
       //base fare = 3$
       double baseFare = 3;
       double distanceFare = (details.distanceValue/1000)*0.3;
-      print('Distant to Pune is ${details.distanceValue}');
-      print('TIME to Pune is ${details.durationValue}');
-      double timeFare = (details.durationValue/60)*0.2;
+      double timeFare = (durationValue/60)*0.2;
       double totalFare = baseFare + distanceFare + timeFare;
-      print('BaseFare is ${baseFare}');
-      print(timeFare);
-      print(distanceFare);
-      print(totalFare);
-
       return totalFare.truncate();
-
     }
     static double generateRandomNumber(int max)
     {
@@ -64,7 +58,11 @@ class HelperMethods{
      homeTabPositionStream.resume();
      Geofire.setLocation(currentFireBaseUser.uid, currentPosition.latitude, currentPosition.longitude);
    }
-
-
-
+   static void showProgressDialog(context){
+     showDialog
+       (
+         context: context,
+     barrierDismissible: false,
+     builder: (BuildContext context)=>ProgressDialogue(status:'Please Wait'));
+   }
 }
